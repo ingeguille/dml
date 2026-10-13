@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lenguaje DML | Base de Datos I</title>
+<style>
+:root{--navy:#12243a;--blue:#1768ac;--pale:#eef5fb;--line:#dce5ed;--ink:#243244;--green:#087d64}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font:16px/1.65 system-ui,Segoe UI,Arial,sans-serif;color:var(--ink);background:#f6f8fb}header{background:linear-gradient(125deg,#12243a,#1768ac);color:white;padding:42px max(20px,calc((100% - 1100px)/2))}header h1{font-size:clamp(30px,4vw,48px);margin:0}header p{max-width:780px;margin:8px 0}header .tag{display:inline-block;background:#ffffff22;border:1px solid #ffffff55;border-radius:30px;padding:3px 12px;font-size:13px;margin-top:12px}.layout{display:grid;grid-template-columns:240px minmax(0,1fr);max-width:1200px;margin:auto;gap:24px;padding:24px}aside{position:sticky;top:20px;align-self:start;background:white;border:1px solid var(--line);border-radius:12px;padding:18px;max-height:calc(100vh - 40px);overflow:auto}aside a{display:block;text-decoration:none;color:#31516f;padding:6px 8px;border-radius:6px;font-size:14px}aside a:hover{background:var(--pale)}main{min-width:0}.panel{background:white;border:1px solid var(--line);border-radius:14px;padding:clamp(18px,3vw,32px);margin-bottom:20px;box-shadow:0 2px 8px #12243a08}h2{color:var(--navy);margin-top:0;border-bottom:2px solid var(--pale);padding-bottom:10px}h3{color:#1768ac;margin-bottom:6px}p{margin:8px 0 16px}pre{background:#142338;color:#e7f4ff;border-radius:9px;padding:18px;overflow-x:auto;font-size:14px;line-height:1.6}code{font-family:Consolas,Monaco,monospace}p code,li code,td code{background:#edf3f8;padding:2px 5px;border-radius:4px;color:#125486}.note{background:#eaf5ff;border-left:4px solid var(--blue);padding:12px 16px;border-radius:5px;margin:15px 0}.warning{background:#fff5e6;border-left:4px solid #d98a16;padding:12px 16px;border-radius:5px;margin:15px 0}table{border-collapse:collapse;width:100%;margin:12px 0 20px;font-size:14px}th,td{border:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}th{background:#eaf1f8}tr:nth-child(even){background:#fafcff}.tablewrap{overflow:auto}.diagram{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:center;margin:20px 0}.entity{border:1px solid #9eb6cb;border-radius:9px;min-width:180px;overflow:hidden}.entity b{display:block;background:#d9ebf8;padding:8px 12px}.entity span{display:block;padding:3px 12px;font-size:14px}.connector{color:#1768ac;font-size:25px;font-weight:bold}.quiz{border:1px solid var(--line);padding:16px;border-radius:10px;margin:12px 0}.quiz label{display:block;padding:4px}.feedback{font-weight:600;margin-top:8px}.good{color:var(--green)}.bad{color:#b34232}button{background:var(--blue);color:white;border:0;border-radius:7px;padding:9px 15px;cursor:pointer;font-weight:600}button:hover{background:#115387}.copy{float:right;font-size:12px;margin-bottom:6px}.codebox{margin:12px 0 20px}.codebox:after{content:'';display:block;clear:both}.meta{font-size:14px;color:#53677a}.checklist li{padding:4px 0}footer{text-align:center;padding:30px;color:#667}.printbtn{background:white;color:var(--navy);margin-top:15px}@media(max-width:800px){.layout{grid-template-columns:1fr;padding:12px}aside{position:static;max-height:none}header{padding:30px 20px}.connector{display:none}}@media print{aside,.copy,.printbtn,button{display:none!important}.layout{display:block;padding:0}.panel{box-shadow:none;break-inside:avoid;border:0;border-bottom:1px solid #ddd}header{color:#111;background:white;padding:10px}pre{white-space:pre-wrap;color:#111;background:#f1f1f1}}
+</style>
+</head>
+<body>
+<header><h1>Lenguaje DML en SQL</h1><p>Manual completo para enseñar manipulación de datos en bases de datos relacionales: teoría, sintaxis, ejemplos, consultas relacionadas, prácticas y autoevaluación.</p><span class="tag">Base de Datos I</span> <span class="tag">MySQL y PostgreSQL</span> <span class="tag">Básico → Avanzado</span><br><button class="printbtn" onclick="window.print()">Imprimir / Guardar como PDF</button></header>
+<div class="layout"><aside><strong>Contenido de la clase</strong><nav id="menu"></nav></aside><main id="content"></main></div><footer>Material didáctico · Lenguaje DML · Base de Datos I</footer>
+<script>
+const sections=[
+['Introducción a DML',`<p><strong>DML (Data Manipulation Language)</strong> es el lenguaje de manipulación de datos de SQL. Permite agregar, consultar, modificar y eliminar registros de las tablas.</p><div class="tablewrap"><table><tr><th>DDL: estructura</th><th>DML: datos</th></tr><tr><td>CREATE, ALTER, DROP, TRUNCATE</td><td>INSERT, UPDATE, DELETE; SELECT se estudia habitualmente con DML, aunque también se clasifica como DQL.</td></tr></table></div><div class="note"><strong>Objetivo:</strong> utilizar SQL para resolver operaciones reales sobre un sistema académico, incluyendo relaciones entre tablas.</div>`],
+['Modelo de datos y preparación',`<p>Trabajaremos con <strong>alumnos</strong>, <strong>cursos</strong> e <strong>inscripciones</strong>. Una inscripción relaciona un alumno con un curso.</p><div class="diagram"><div class="entity"><b>alumnos</b><span>PK id_alumno</span><span>nombre</span><span>apellido</span><span>ciudad</span></div><span class="connector">1 → N</span><div class="entity"><b>inscripciones</b><span>PK id_inscripcion</span><span>FK id_alumno</span><span>FK id_curso</span></div><span class="connector">N ← 1</span><div class="entity"><b>cursos</b><span>PK id_curso</span><span>nombre_curso</span><span>costo</span></div></div><h3>Crear las tablas (DDL de preparación)</h3><pre>CREATE TABLE alumnos (
+  id_alumno INT PRIMARY KEY,
+  nombre VARCHAR(50),
+  apellido VARCHAR(50),
+  ciudad VARCHAR(50)
+);
+
+CREATE TABLE cursos (
+  id_curso INT PRIMARY KEY,
+  nombre_curso VARCHAR(100),
+  costo DECIMAL(10,2)
+);
+
+CREATE TABLE inscripciones (
+  id_inscripcion INT PRIMARY KEY,
+  id_alumno INT,
+  id_curso INT,
+  FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno),
+  FOREIGN KEY (id_curso) REFERENCES cursos(id_curso)
+);</pre><div class="note">Ejecutar este script una sola vez en una base de datos de práctica vacía.</div>`],
+['INSERT INTO: insertar datos',`<p><strong>INSERT INTO</strong> agrega una o varias filas a una tabla. Es preferible indicar los nombres de las columnas.</p><pre>INSERT INTO alumnos (id_alumno, nombre, apellido, ciudad)
+VALUES (1, 'Juan', 'González', 'Caacupé');
+
+INSERT INTO alumnos (id_alumno, nombre, apellido, ciudad)
+VALUES
+(2, 'Ana', 'López', 'Asunción'),
+(3, 'Carlos', 'Benítez', 'Caacupé'),
+(4, 'María', 'Fernández', 'San Lorenzo'),
+(5, 'Pedro', 'Martínez', 'Asunción');
+
+INSERT INTO cursos (id_curso, nombre_curso, costo)
+VALUES
+(1, 'Base de Datos', 250000),
+(2, 'Programación Java', 300000),
+(3, 'Desarrollo Web', 200000);
+
+INSERT INTO inscripciones (id_inscripcion, id_alumno, id_curso)
+VALUES
+(1, 1, 1), (2, 1, 2), (3, 2, 1),
+(4, 3, 3), (5, 4, 2);</pre><p><strong>Explicación:</strong> los valores de texto van entre comillas simples; los números no necesitan comillas. Los identificadores de las claves foráneas deben existir en las tablas relacionadas.</p>`],
+['SELECT: consultas básicas',`<p><strong>SELECT</strong> recupera datos. <code>*</code> significa todas las columnas.</p><pre>SELECT * FROM alumnos;
+
+SELECT nombre, apellido FROM alumnos;
+
+SELECT nombre AS Nombre, apellido AS Apellido
+FROM alumnos;
+
+SELECT DISTINCT ciudad FROM alumnos;</pre><p><strong>Alias:</strong> <code>AS</code> cambia el encabezado mostrado, sin modificar la estructura de la tabla. <strong>DISTINCT</strong> evita valores repetidos en el resultado.</p>`],
+['WHERE y operadores',`<p><strong>WHERE</strong> selecciona las filas que cumplen una condición.</p><pre>SELECT * FROM alumnos WHERE ciudad = 'Caacupé';
+SELECT * FROM cursos WHERE costo >= 250000;
+SELECT * FROM alumnos
+WHERE ciudad = 'Caacupé' AND nombre = 'Juan';
+SELECT * FROM alumnos
+WHERE ciudad = 'Caacupé' OR ciudad = 'Asunción';
+SELECT * FROM alumnos WHERE NOT ciudad = 'Caacupé';</pre><div class="tablewrap"><table><tr><th>Operador</th><th>Significado</th></tr><tr><td>=, &lt;&gt;</td><td>Igual, diferente</td></tr><tr><td>&gt;, &lt;, &gt;=, &lt;=</td><td>Mayor, menor, mayor o igual, menor o igual</td></tr><tr><td>AND</td><td>Ambas condiciones verdaderas</td></tr><tr><td>OR</td><td>Al menos una condición verdadera</td></tr><tr><td>NOT</td><td>Niega la condición</td></tr></table></div>`],
+['BETWEEN, IN, LIKE y NULL',`<h3>BETWEEN: rango inclusivo</h3><pre>SELECT * FROM cursos
+WHERE costo BETWEEN 200000 AND 300000;</pre><h3>IN: varios valores</h3><pre>SELECT * FROM alumnos
+WHERE ciudad IN ('Caacupé', 'Asunción');</pre><h3>LIKE: patrones</h3><pre>SELECT * FROM alumnos WHERE nombre LIKE 'A%';
+SELECT * FROM alumnos WHERE nombre LIKE '%a';
+SELECT * FROM alumnos WHERE nombre LIKE '_a%';</pre><p><code>%</code> representa cero o más caracteres y <code>_</code> representa exactamente uno.</p><h3>IS NULL: valores ausentes</h3><pre>SELECT * FROM alumnos WHERE ciudad IS NULL;
+SELECT * FROM alumnos WHERE ciudad IS NOT NULL;</pre><div class="warning">Para comparar con NULL no se utiliza <code>= NULL</code>. Se utiliza <code>IS NULL</code>.</div>`],
+['ORDER BY y LIMIT',`<p><strong>ORDER BY</strong> ordena filas; <strong>LIMIT</strong> restringe la cantidad de resultados en MySQL y PostgreSQL.</p><pre>SELECT * FROM alumnos ORDER BY apellido ASC;
+SELECT * FROM cursos ORDER BY costo DESC;
+SELECT * FROM alumnos
+ORDER BY ciudad ASC, apellido ASC;
+SELECT * FROM alumnos ORDER BY id_alumno LIMIT 3;
+SELECT * FROM alumnos
+ORDER BY id_alumno LIMIT 3 OFFSET 2;</pre><p><code>ASC</code> significa ascendente y <code>DESC</code> descendente. Para paginar resultados, es recomendable ordenar por un criterio estable.</p>`],
+['Funciones de agregación',`<div class="tablewrap"><table><tr><th>Función</th><th>Uso</th></tr><tr><td>COUNT(*)</td><td>Cuenta filas</td></tr><tr><td>SUM(campo)</td><td>Suma valores no nulos</td></tr><tr><td>AVG(campo)</td><td>Calcula promedio</td></tr><tr><td>MAX(campo)</td><td>Mayor valor</td></tr><tr><td>MIN(campo)</td><td>Menor valor</td></tr></table></div><pre>SELECT COUNT(*) AS total_alumnos FROM alumnos;
+SELECT SUM(costo) AS suma_costos FROM cursos;
+SELECT AVG(costo) AS promedio FROM cursos;
+SELECT MAX(costo) AS mayor FROM cursos;
+SELECT MIN(costo) AS menor FROM cursos;</pre><p>Las funciones de agregación, salvo <code>COUNT(*)</code>, normalmente ignoran los valores NULL.</p>`],
+['GROUP BY y HAVING',`<p><strong>GROUP BY</strong> agrupa filas. <strong>HAVING</strong> filtra los grupos resultantes.</p><pre>SELECT ciudad, COUNT(*) AS cantidad
+FROM alumnos
+GROUP BY ciudad;
+
+SELECT ciudad, COUNT(*) AS cantidad
+FROM alumnos
+GROUP BY ciudad
+HAVING COUNT(*) >= 2;</pre><div class="tablewrap"><table><tr><th>Ciudad</th><th>Cantidad inicial</th></tr><tr><td>Caacupé</td><td>2</td></tr><tr><td>Asunción</td><td>2</td></tr><tr><td>San Lorenzo</td><td>1</td></tr></table></div><div class="note"><strong>Diferencia:</strong> WHERE filtra filas antes de agrupar; HAVING filtra resultados agrupados.</div>`],
+['UPDATE: modificar datos',`<p><strong>UPDATE</strong> modifica registros existentes. <strong>SET</strong> indica los nuevos valores.</p><pre>UPDATE alumnos
+SET ciudad = 'Areguá'
+WHERE id_alumno = 1;
+
+UPDATE alumnos
+SET nombre = 'Juan Carlos',
+    apellido = 'González López'
+WHERE id_alumno = 1;
+
+UPDATE cursos SET costo = costo * 1.10;</pre><div class="warning"><strong>Atención:</strong> el último UPDATE afecta todos los cursos porque no contiene WHERE. Antes de modificar, ejecutar un SELECT con la misma condición.</div>`],
+['DELETE: eliminar datos',`<p><strong>DELETE</strong> elimina filas de una tabla.</p><pre>DELETE FROM alumnos WHERE id_alumno = 5;
+
+DELETE FROM alumnos WHERE ciudad = 'San Lorenzo';
+
+-- PELIGRO: intenta eliminar todas las filas
+DELETE FROM alumnos;</pre><div class="warning">Una clave foránea puede impedir la eliminación de un alumno que tiene inscripciones. Primero se deben revisar las relaciones y la política de eliminación. No ejecutar ejemplos destructivos sobre datos importantes.</div>`],
+['JOIN: tablas relacionadas',`<p>Los JOIN permiten combinar información utilizando claves relacionadas.</p><h3>INNER JOIN: solo coincidencias</h3><pre>SELECT a.nombre, a.apellido, c.nombre_curso
+FROM inscripciones i
+INNER JOIN alumnos a ON i.id_alumno = a.id_alumno
+INNER JOIN cursos c ON i.id_curso = c.id_curso;</pre><h3>LEFT JOIN: todos los alumnos</h3><pre>SELECT a.nombre, c.nombre_curso
+FROM alumnos a
+LEFT JOIN inscripciones i ON a.id_alumno = i.id_alumno
+LEFT JOIN cursos c ON i.id_curso = c.id_curso;</pre><h3>RIGHT JOIN: todos los cursos</h3><pre>SELECT a.nombre, c.nombre_curso
+FROM inscripciones i
+RIGHT JOIN cursos c ON i.id_curso = c.id_curso
+LEFT JOIN alumnos a ON i.id_alumno = a.id_alumno;</pre><h3>FULL OUTER JOIN (PostgreSQL)</h3><pre>SELECT a.nombre, i.id_inscripcion
+FROM alumnos a
+FULL OUTER JOIN inscripciones i
+  ON a.id_alumno = i.id_alumno;</pre><div class="note">MySQL no implementa directamente FULL OUTER JOIN. Puede simularse combinando LEFT JOIN y RIGHT JOIN con UNION.</div>`],
+['Subconsultas y EXISTS',`<p>Una <strong>subconsulta</strong> es una consulta dentro de otra. <code>EXISTS</code> comprueba si existe alguna fila relacionada.</p><pre>-- Cursos superiores al promedio
+SELECT * FROM cursos
+WHERE costo > (SELECT AVG(costo) FROM cursos);
+
+-- Alumnos con inscripciones
+SELECT * FROM alumnos
+WHERE id_alumno IN (
+  SELECT id_alumno FROM inscripciones
+);
+
+-- Alumnos sin inscripciones
+SELECT * FROM alumnos a
+WHERE NOT EXISTS (
+  SELECT 1 FROM inscripciones i
+  WHERE i.id_alumno = a.id_alumno
+);</pre>`],
+['Transacciones: TCL',`<p>Las transacciones permiten confirmar o deshacer un conjunto de cambios. Se clasifican como TCL y se enseñan aquí por su relación directa con DML.</p><pre>START TRANSACTION;
+UPDATE cursos SET costo = 280000 WHERE id_curso = 1;
+UPDATE cursos SET costo = 320000 WHERE id_curso = 2;
+COMMIT;</pre><pre>START TRANSACTION;
+UPDATE cursos SET costo = 100000 WHERE id_curso = 1;
+ROLLBACK;</pre><p><code>COMMIT</code> confirma; <code>ROLLBACK</code> revierte cambios pendientes; <code>SAVEPOINT</code> permite marcar puntos de recuperación. Se requieren tablas con soporte de transacciones (por ejemplo, InnoDB en MySQL).</p>`],
+['Ejercicios para estudiantes',`<p>Resolver las siguientes actividades en una base de práctica. Cada ejercicio debe incluir el SQL y una captura o descripción del resultado.</p><ol class="checklist"><li>Insertar cinco alumnos nuevos.</li><li>Insertar tres cursos nuevos.</li><li>Mostrar todos los alumnos.</li><li>Mostrar solo nombre y apellido.</li><li>Consultar alumnos de Caacupé.</li><li>Consultar cursos que cuestan más de G. 250.000.</li><li>Ordenar alumnos por apellido.</li><li>Mostrar ciudades sin repetir.</li><li>Buscar nombres que comienzan con M.</li><li>Consultar cursos entre G. 200.000 y 300.000.</li><li>Contar alumnos por ciudad.</li><li>Calcular el costo promedio de los cursos.</li><li>Mostrar ciudades con más de dos alumnos.</li><li>Modificar la ciudad de un alumno.</li><li>Aumentar el costo de todos los cursos un 15 %.</li><li>Eliminar un alumno que no tenga inscripciones.</li><li>Mostrar alumnos con sus cursos mediante JOIN.</li><li>Mostrar alumnos sin inscripciones.</li><li>Contar inscripciones por curso.</li><li>Consultar cursos cuyo costo supera el promedio.</li></ol>`],
+['Autoevaluación interactiva',`<p>Elegí una respuesta en cada pregunta y presioná <strong>Corregir</strong>.</p><div id="quiz"></div><button onclick="checkQuiz()">Corregir respuestas</button> <button onclick="resetQuiz()" style="background:#5e7287">Reiniciar</button><p id="score" aria-live="polite"></p>`],
+['Planificación y criterios de evaluación',`<div class="tablewrap"><table><tr><th>Clase</th><th>Contenido</th><th>Práctica</th></tr><tr><td>1 (2 horas)</td><td>INSERT, SELECT, WHERE, operadores, ORDER BY</td><td>Ejercicios 1–10</td></tr><tr><td>2 (2 horas)</td><td>Funciones, GROUP BY, HAVING, UPDATE, DELETE</td><td>Ejercicios 11–16</td></tr><tr><td>3 (2 horas)</td><td>JOIN, subconsultas y transacciones</td><td>Ejercicios 17–20</td></tr></table></div><h3>Rúbrica sugerida (20 puntos)</h3><div class="tablewrap"><table><tr><th>Criterio</th><th>Puntos</th></tr><tr><td>Inserción y consultas básicas</td><td>4</td></tr><tr><td>Filtros, orden y funciones</td><td>5</td></tr><tr><td>Modificación y eliminación segura</td><td>3</td></tr><tr><td>JOIN y subconsultas</td><td>6</td></tr><tr><td>Interpretación y explicación de resultados</td><td>2</td></tr></table></div><p><strong>Resultado esperado:</strong> el estudiante consulta, inserta, modifica y elimina datos correctamente y obtiene información relacionada de varias tablas.</p>`]
+];
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+document.getElementById('menu').innerHTML=sections.map((s,i)=>`<a href="#sec${i}">${i+1}. ${s[0]}</a>`).join('');
+document.getElementById('content').innerHTML=sections.map((s,i)=>`<section class="panel" id="sec${i}"><h2>${i+1}. ${s[0]}</h2>${s[1]}</section>`).join('');
+document.querySelectorAll('pre').forEach(pre=>{const box=document.createElement('div');box.className='codebox';pre.parentNode.insertBefore(box,pre);box.appendChild(pre);const b=document.createElement('button');b.className='copy';b.textContent='Copiar SQL';b.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(pre.textContent);b.textContent='Copiado';setTimeout(()=>b.textContent='Copiar SQL',1300)}catch(e){b.textContent='Seleccioná el código'}});box.insertBefore(b,pre)});
+const questions=[['¿Qué instrucción inserta registros?',['SELECT','INSERT INTO','DROP'],1],['¿Qué hace WHERE?',['Filtra filas','Crea tablas','Ordena automáticamente'],0],['¿Qué función cuenta registros?',['SUM','AVG','COUNT'],2],['¿Qué JOIN conserva todos los alumnos de la tabla izquierda?',['INNER JOIN','LEFT JOIN','CROSS JOIN'],1],['¿Qué ocurre con UPDATE sin WHERE?',['Actualiza todas las filas','No actualiza ninguna','Elimina la tabla'],0]];
+const quiz=document.getElementById('quiz');quiz.innerHTML=questions.map((q,i)=>`<div class="quiz"><strong>${i+1}. ${q[0]}</strong>${q[1].map((a,j)=>`<label><input type="radio" name="q${i}" value="${j}"> ${a}</label>`).join('')}<div class="feedback" id="f${i}"></div></div>`).join('');
+function checkQuiz(){let correct=0;questions.forEach((q,i)=>{const x=document.querySelector(`input[name=q${i}]:checked`);const f=document.getElementById('f'+i);if(!x){f.textContent='Sin responder';f.className='feedback bad'}else if(+x.value===q[2]){correct++;f.textContent='Correcto';f.className='feedback good'}else{f.textContent='Incorrecto. Respuesta: '+q[1][q[2]];f.className='feedback bad'}});document.getElementById('score').textContent=`Puntaje: ${correct} de ${questions.length}`}
+function resetQuiz(){document.querySelectorAll('#quiz input').forEach(x=>x.checked=false);document.querySelectorAll('.feedback').forEach(x=>x.textContent='');document.getElementById('score').textContent=''}
+</script></body></html>
